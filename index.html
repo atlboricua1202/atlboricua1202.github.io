@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:monospace;padding:2rem;background:#111;color:#0f0">
+<h2>PoC Capture — atlboricua1202</h2>
+<pre id="out"></pre>
+<script>
+  var p = new URLSearchParams(location.search);
+  var out = 'Full URL:
+' + location.href + '
+
+';
+  p.forEach(function(v,k){ out += k + ' = ' + v + '
+'; });
+  document.getElementById('out').textContent = out;
+</script>
+</body>
+</html>
