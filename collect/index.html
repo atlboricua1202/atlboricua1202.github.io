@@ -1,0 +1,12 @@
+<title>PoC Collector</title>
+<h2>Redirect received</h2>
+<p>This page confirms the open redirect PoC for Unico IDtech (HackerOne).</p>
+<p><strong>URL parameters captured:</strong></p>
+<pre id="params"></pre>
+<script>
+  var p = new URLSearchParams(window.location.search);
+  var out = [];
+  p.forEach(function(v, k) { out.push(k + ' = ' + v); });
+  document.getElementById('params').textContent = out.length ? out.join('\n') : '(none — redirect arrived without query params)';
+  document.getElementById('params').textContent += '\n\nFull URL: ' + window.location.href;
+</script>
